@@ -4,9 +4,6 @@
 #include "Arduino.h"
 #include "/home/jeff/Dev/arduino-1.0.6/libraries/EEPROM/EEPROM.h"
 
-#include "LPD8806.h"
-#include "Adafruit_WS2801.h"
-
 
 // Configuration indicies
 #define EEPROM_HEADER       42
@@ -17,97 +14,8 @@
 #define LAST_PROGRAM_ADDR    5
 #define EEPROM_LAST_INDEX   15
 
-#define LED_TYPE_COUNT       2
-const char LED_TYPE_NAME_LIST[][20] = { "", "WS2801", "LPD8806" };
-
 #define COMMAND_ARRAY_SIZE 40
 #define COMMAND_MAX_SIZE COMMAND_ARRAY_SIZE - 1
-
-
-
-
-/**
- * Controller for the WS2801 LED light strip
- */
-class WS2801Controller : public LedController
-{
-  public:
-    WS2801Controller( uint16_t numLeds )
-    {
-      strip = new Adafruit_WS2801( numLeds );
-      strip->begin();
-    }
-    
-    ~WS2801Controller()
-    {
-      delete strip;
-    }
-    
-    virtual void setPixel( uint16_t index, uint8_t r, uint8_t g, uint8_t b )
-    {
-      strip->setPixelColor( index, r, g, b );
-    }
-
-    virtual void updateLength( uint16_t len )
-    {
-      strip->updateLength( len );
-    }
-
-    virtual uint16_t getLength()
-    {
-      return strip->numPixels();
-    }
-    
-    virtual void show()
-    {
-      strip->show();
-    }
-            
-  private:
-    Adafruit_WS2801 *strip;
-};
-
-/**
- * Controller for the LPD8806 LED strip
- */
-class LPD8806Controller : public LedController
-{
-  public:
-    LPD8806Controller( uint16_t numLeds )
-    {
-      strip = new LPD8806( numLeds );
-      strip->begin();
-    }
-    
-    ~LPD8806Controller()
-    {
-       delete strip;
-    }
-
-    virtual void setPixel( uint16_t index, uint8_t r, uint8_t g, uint8_t b )
-    {
-      strip->setPixelColor( index, r, g, b );
-    }
-    
-    virtual void updateLength( uint16_t len )
-    {
-      strip->updateLength( len );
-    }
-    
-    virtual uint16_t getLength()
-    {
-      return strip->numPixels();
-    }
-    
-    virtual void show()
-    {
-      strip->show();
-    }
-    
-  private:
-    LPD8806 *strip;
-};
-
 
 
 
@@ -160,7 +68,7 @@ void LedManager::dumpConfig()
   }
   else
   {
-    Serial.println( LED_TYPE_NAME_LIST[ ledChip ] );
+    Serial.println( LedController::getNameFromIndex( ledChip ) );
   }
   
   Serial.print( "Display Program: " );
@@ -211,14 +119,8 @@ void LedManager::initLEDs()
   // verify we have something to do
   if ( ledChip > 0 && numLeds > 0 )
   {
-    if ( ledChip == 1 )
-    {
-      controller = new WS2801Controller( numLeds );
-    }
-    else if ( ledChip == 2 )
-    {
-      controller = new LPD8806Controller( numLeds );
-    }
+    const char *chipset = LedController::getNameFromIndex( ledChip );
+    controller = LedController::create( chipset, numLeds );
   }
   
   if ( controller == NULL )
@@ -302,9 +204,9 @@ void LedManager::handleHelp( const char *helpcmd )
     Serial.println( "  Set the type of LED strip that you are using" );
     Serial.println( "" );
     Serial.println( "  Availble types:" );
-    for ( int i = 1; i <= LED_TYPE_COUNT; i++ )
+    for ( int i = 1; i <= LedController::getNumberOfSupportedControllers(); i++ )
     {
-      Serial.println( LED_TYPE_NAME_LIST[ i ] );
+      Serial.println( LedController::getNameFromIndex( i ) );
     }
   }
   else if ( strcmp( helpcmd, "startProgram" ) == 0 )
@@ -356,15 +258,7 @@ void LedManager::handleLedType( const char *str )
 {
   clearLEDs();
   
-  int type = -1;
-  // find the type by name
-  for ( int i = 1; i <= LED_TYPE_COUNT; i++ )
-  {
-    if ( strcmp( str, LED_TYPE_NAME_LIST[ i ] ) == 0 )
-    {
-      type = i;
-    }
-  }
+  int type = LedController::getIndexFromName( str );
 
   if ( type >= 0 )
   {
