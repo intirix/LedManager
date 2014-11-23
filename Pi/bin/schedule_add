@@ -1,0 +1,12 @@
+#!/bin/bash
+
+. $( dirname $0 )/common.sh
+
+(
+	if [ -e $schedule_dir/$date.txt ]
+	then
+		cat $schedule_dir/$date.txt
+	fi
+	echo $2
+) | sort -u > $schedule_dir/$date.tmp
+/bin/mv -f $schedule_dir/$date.tmp $schedule_dir/$date.txt

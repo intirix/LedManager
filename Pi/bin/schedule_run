@@ -1,0 +1,13 @@
+#!/bin/bash
+
+. $( dirname $0 )/common.sh
+
+if [ -e $schedule_dir/$date.txt ]
+then
+	program=$( sort -R $schedule_dir/$date.txt | head -n 1 )
+	if [ -n "$program" ]
+	then
+		echo "Running $program"
+		$bindir/send_command startProgram $program
+	fi
+fi

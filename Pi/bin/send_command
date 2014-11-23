@@ -1,0 +1,8 @@
+#!/bin/bash
+
+(
+	$( dirname $0 )/SendCommand.py $*
+) &
+pid=$!
+sleep 2
+kill $pid 2>/dev/null
