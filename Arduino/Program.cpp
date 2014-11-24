@@ -149,9 +149,74 @@ class RedProgram : public Program
 };
 
 
+class BlueWhiteProgram : public Program
+{
+  public:
+    void loop()
+    {
+      const uint16_t len = getVirtualLength();
+      for ( int i = 0; i < len; i += 2 )
+      {
+        setVirtualPixel( i + 0, 0x00, 0x00, 0xFF );
+        setVirtualPixel( i + 1, 0xFF, 0xFF, 0xFF );
+      }
+      controller->show();
+    }
+};
 
-#define  NUM_PROGRAMS 7
-const char PROGRAM_NAMES[][20] = { "Blank", "BlueGreen", "RedGreen", "Multicolor", "Blue", "White", "Red", NULL };
+
+class BlueYellowProgram : public Program
+{
+  public:
+    void loop()
+    {
+      const uint16_t len = getVirtualLength();
+      for ( int i = 0; i < len; i += 2 )
+      {
+        setVirtualPixel( i + 0, 0x00, 0x00, 0xFF );
+        setVirtualPixel( i + 1, 0xFF, 0xFF, 0x00 );
+      }
+      controller->show();
+    }
+};
+
+
+class SigEpProgram : public Program
+{
+  public:
+    void loop()
+    {
+      const uint16_t len = getVirtualLength();
+      for ( int i = 0; i < len; i += 2 )
+      {
+        setVirtualPixel( i + 0, 0x80, 0x00, 0x80 );
+        setVirtualPixel( i + 1, 0xFF, 0x00, 0x00 );
+      }
+      controller->show();
+    }
+};
+
+
+class PhiSigPiProgram : public Program
+{
+  public:
+    void loop()
+    {
+      const uint16_t len = getVirtualLength();
+      for ( int i = 0; i < len; i += 2 )
+      {
+        setVirtualPixel( i + 0, 0x30, 0x13, 0x57 );
+        setVirtualPixel( i + 1, 0xB8, 0x9D, 0x66 );
+      }
+      controller->show();
+    }
+};
+
+
+
+
+#define  NUM_PROGRAMS 11
+const char PROGRAM_NAMES[][20] = { "Blank", "BlueGreen", "RedGreen", "Multicolor", "Blue", "White", "Red", "BlueWhite", "BlueYellow", "SigEp", "PhiSigPi", NULL };
 
 
 
@@ -183,6 +248,22 @@ Program *Program::createProgram( const char *name )
   {
     program = new RedProgram();
   }
+  else if ( strncmp( name, "BlueWhite", 20 ) == 0 )
+  {
+    program = new BlueWhiteProgram();
+  }
+  else if ( strncmp( name, "BlueYellow", 20 ) == 0 )
+  {
+    program = new BlueYellowProgram();
+  }
+  else if ( strncmp( name, "SigEp", 20 ) == 0 )
+  {
+    program = new SigEpProgram();
+  }
+  else if ( strncmp( name, "PhiSigPi", 20 ) == 0 )
+  {
+    program = new PhiSigPiProgram();
+  }
   else
   {
     program = new BlankProgram();
@@ -196,20 +277,6 @@ Program *Program::createProgram( const char *name )
       break;
     }
   }
-
-/*  
-  uint8_t index = 0;
-  do
-  {
-    if ( strncmp( name, PROGRAM_NAMES[ index ], 20 ) == 0 )
-    {
-      program->programIndex = index;
-    }
-    
-    index++;
-  }
-  while ( PROGRAM_NAMES[ index ] != NULL );
-  */
   
   return program;
 }
