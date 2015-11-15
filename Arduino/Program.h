@@ -9,6 +9,9 @@
 class Program
 {
   public:
+
+    virtual ~Program() {}
+    
     /**
      * Set the LedController to use
      *
@@ -26,7 +29,7 @@ class Program
     
     uint16_t getLength()
     {
-      controller->getLength();
+      return controller->getLength();
     }
     
     /**
@@ -69,6 +72,13 @@ class Program
      * Get a program name by the index
      */
     static const char *getProgramByIndex( uint8_t index );
+
+    void incrementRuntime() {
+      runtime++;
+    }
+    uint32_t getRuntime() {
+      return runtime;
+    }
   
   protected:
     /**
@@ -83,6 +93,7 @@ class Program
     
   private:
     uint8_t programIndex = 0;
+    uint32_t runtime = 0;
 };
 
 #endif

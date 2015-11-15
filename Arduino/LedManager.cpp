@@ -1,8 +1,9 @@
 
+
 #include "LedManager.h"
 #include <stdlib.h>
 #include "Arduino.h"
-#include "/home/jeff/Dev/arduino-1.0.6/libraries/EEPROM/EEPROM.h"
+#include <EEPROM.h>
 
 
 // Configuration indicies
@@ -291,6 +292,7 @@ void LedManager::loop()
   }
   
   currentProgram->loop();
+  currentProgram->incrementRuntime();
   
   delay( 10 );
 }

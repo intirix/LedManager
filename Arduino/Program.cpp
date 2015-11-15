@@ -1,5 +1,6 @@
 #include "Program.h"
 #include <string.h>
+#include <SPI.h>
 
 
 uint16_t Program::getVirtualLength()
@@ -212,11 +213,52 @@ class PhiSigPiProgram : public Program
     }
 };
 
+#define  NUM_PROGRAMS 12
+
+class RandomProgram : public Program
+{
+  public:
+    RandomProgram() : Program()
+    {
+      child = NULL;
+    }
+    
+    void loop()
+    {
+      if ( child == NULL )
+      {
+        int index = random( 2, NUM_PROGRAMS );
+        const char *name = Program::getProgramByIndex( index );
+        child = Program::createProgram( name );
+
+        child->setController( controller );
+        child->init();
+
+      }
+      
+      //setVirtualPixel( child->getRuntime(), 0xFF, 0x00, 0x00 );
+      controller->show();
+
+      child->loop();
+      child->incrementRuntime();
+      
+
+      //uint16_t maxRuntime = 100;
+      uint16_t maxRuntime = 100 * 60 * 5;
+
+      if ( child->getRuntime() > maxRuntime )
+      {
+        delete child;
+        child = NULL;
+      }
+      
+    }
+  private:
+    Program *child;
+};
 
 
-
-#define  NUM_PROGRAMS 11
-const char PROGRAM_NAMES[][20] = { "Blank", "BlueGreen", "RedGreen", "Multicolor", "Blue", "White", "Red", "BlueWhite", "BlueYellow", "SigEp", "PhiSigPi", NULL };
+const char PROGRAM_NAMES[][20] = { "Blank", "Random", "BlueGreen", "RedGreen", "Multicolor", "Blue", "White", "Red", "BlueWhite", "BlueYellow", "SigEp", "PhiSigPi", "" };
 
 
 
@@ -224,7 +266,12 @@ const char PROGRAM_NAMES[][20] = { "Blank", "BlueGreen", "RedGreen", "Multicolor
 Program *Program::createProgram( const char *name )
 {
   Program *program = NULL;
-  if ( strncmp( name, "BlueGreen", 20 ) == 0 )
+  if ( strncmp( name, "Random", 20 ) == 0 )
+  {
+    program = new RandomProgram();
+    //program = new BlueGreenProgram();
+  }
+  else if ( strncmp( name, "BlueGreen", 20 ) == 0 )
   {
     program = new BlueGreenProgram();
   }

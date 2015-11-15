@@ -9,6 +9,7 @@
 class LedController
 {
   public:
+    virtual ~LedController(){}
     virtual void setPixel( uint16_t index, uint8_t r, uint8_t g, uint8_t b ) {}
     virtual void updateLength( uint16_t len ) {}
     virtual uint16_t getLength() { return 0; }

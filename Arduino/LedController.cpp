@@ -1,11 +1,11 @@
 #include "LedController.h"
 
-#include "LPD8806.h"
-#include "Adafruit_WS2801.h"
+/*#include <LPD8806.h>*/
+#include <Adafruit_WS2801.h>
 
 
 #define LED_TYPE_COUNT       2
-const char LED_TYPE_NAME_LIST[][20] = { "", "WS2801", "LPD8806" };
+const char LED_TYPE_NAME_LIST[][20] = { "", "WS2801"/*, "LPD8806"*/ };
 
 
 
@@ -55,7 +55,7 @@ class WS2801Controller : public LedController
 
 /**
  * Controller for the LPD8806 LED strip
- */
+ *
 class LPD8806Controller : public LedController
 {
   public:
@@ -93,7 +93,7 @@ class LPD8806Controller : public LedController
   private:
     LPD8806 *strip;
 };
-
+*/
 
 
 
@@ -108,11 +108,11 @@ LedController *LedController::create( const char *chipset, uint16_t numLeds )
   if ( ledChip == 1 )
   {
     controller = new WS2801Controller( numLeds );
-  }
+  }/*
   else if ( ledChip == 2 )
   {
     controller = new LPD8806Controller( numLeds );
-  }
+  }*/
   return controller;
 }
 
